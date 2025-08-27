@@ -23,11 +23,12 @@ interface PurchaseData {
 
 interface RegistrationScreenProps {
   userInfo: UserInfo;
+  setUserInfo: React.Dispatch<React.SetStateAction<UserInfo>>;
   onProceedToPayment: (data: PurchaseData) => void;
   initialData: PurchaseData;
 }
 
-export function RegistrationScreen({ userInfo, onProceedToPayment, initialData }: RegistrationScreenProps) {
+export function RegistrationScreen({ userInfo, setUserInfo, onProceedToPayment, initialData }: RegistrationScreenProps) {
   const [quantity, setQuantity] = useState(initialData.quantity);
   const [hasPendingDebt, setHasPendingDebt] = useState(initialData.hasPendingDebt);
   const [showSchedule, setShowSchedule] = useState(false);
@@ -126,6 +127,17 @@ export function RegistrationScreen({ userInfo, onProceedToPayment, initialData }
                     <option value="PreKinder">PreKinder</option>
                     <option value="Kinder">Kinder</option>
                     <option value="1ro">1ro</option>
+                    <option value="2do">2do</option>
+                    <option value="3ro">3ro</option>
+                    <option value="4to">4to</option>
+                    <option value="5to">5to</option>
+                    <option value="6to">6to</option>
+                    <option value="7mo">7mo</option>
+                    <option value="8vo">8vo</option>
+                    <option value="1roM">1roM</option>
+                    <option value="2doM">2doM</option>
+                    <option value="3roM">3roM</option>
+                    <option value="4toM">4toM</option>
                   </select>
                 </div>
               </div>

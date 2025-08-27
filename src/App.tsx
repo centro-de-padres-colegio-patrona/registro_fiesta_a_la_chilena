@@ -47,6 +47,7 @@ export default function App() {
         return (
           <RegistrationScreen 
             userInfo={userInfo}
+            setUserInfo={setUserInfo}
             onProceedToPayment={handleProceedToPayment}
             initialData={purchaseData}
           />
