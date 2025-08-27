@@ -7,8 +7,8 @@ export default function App() {
   const [currentScreen, setCurrentScreen] = useState<'login' | 'registration' | 'confirmation'>('login');
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [userInfo, setUserInfo] = useState({
-    guardianName: 'María González',
-    studentName: 'Sofía González'
+    curso: "",
+    seccion: "" 
   });
   const [purchaseData, setPurchaseData] = useState({
     quantity: 1,
@@ -47,6 +47,7 @@ export default function App() {
         return (
           <RegistrationScreen 
             userInfo={userInfo}
+            setUserInfo={setUserInfo}
             onProceedToPayment={handleProceedToPayment}
             initialData={purchaseData}
           />
