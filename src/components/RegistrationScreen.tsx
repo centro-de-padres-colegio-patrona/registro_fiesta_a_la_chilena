@@ -105,14 +105,14 @@ export function RegistrationScreen({ userInfo, onProceedToPayment, initialData }
               <div className="flex items-center space-x-3 p-3 bg-gray-50/90 rounded-lg smooth-transition hover:bg-gray-100/90">
                 <User className="w-5 h-5 text-gray-600" />
                 <div>
-                  <p className="montserrat-light secondary-text">Apoderado</p>
+                  <p className="montserrat-light secondary-text">Curso</p>
                   <p className="montserrat-semibold">{userInfo.guardianName}</p>
                 </div>
               </div>
               <div className="flex items-center space-x-3 p-3 bg-gray-50/90 rounded-lg smooth-transition hover:bg-gray-100/90">
                 <GraduationCap className="w-5 h-5 text-gray-600" />
                 <div>
-                  <p className="montserrat-light secondary-text">Alumno</p>
+                  <p className="montserrat-light secondary-text">Seccion</p>
                   <p className="montserrat-semibold">{userInfo.studentName}</p>
                 </div>
               </div>
@@ -149,15 +149,16 @@ export function RegistrationScreen({ userInfo, onProceedToPayment, initialData }
         </Card>
 
         {/* Selector de entradas */}
+        {/*
         <Card className="shadow-2xl border-0 bg-white/90 backdrop-blur-md smooth-transition hover:shadow-3xl">
           <CardHeader>
-            <CardTitle className="montserrat-semibold">Seleccionar Entradas</CardTitle>
+            
             <p className="montserrat-light secondary-text">
               Adquiere tus entradas para participar en la celebración patria
             </p>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Contador de entradas */}
+            {// Contador de entradas }
             <div className="flex items-center justify-between p-4 bg-gray-50/90 rounded-lg smooth-transition hover:bg-gray-100/90">
               <div>
                 <h3 className="montserrat-semibold">Entrada General</h3>
@@ -186,7 +187,7 @@ export function RegistrationScreen({ userInfo, onProceedToPayment, initialData }
               </div>
             </div>
 
-            {/* Toggle para deuda pendiente */}
+            {// Toggle para deuda pendiente //}
             <div className="flex items-center justify-between">
               <span className="montserrat-regular">¿Tienes deuda pendiente?</span>
               <Button
@@ -205,7 +206,7 @@ export function RegistrationScreen({ userInfo, onProceedToPayment, initialData }
 
             <Separator />
 
-            {/* Desglose de costos */}
+            {// Desglose de costos }
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <span className="montserrat-regular">Subtotal ({quantity} entrada{quantity !== 1 ? 's' : ''})</span>
@@ -227,7 +228,7 @@ export function RegistrationScreen({ userInfo, onProceedToPayment, initialData }
               </div>
             </div>
 
-            {/* Estado del horario seleccionado */}
+            {// Estado del horario seleccionado }
             {selectedSchedule && (
               <div className="p-3 bg-green-50/90 border border-green-200 rounded-lg fade-in backdrop-blur-sm">
                 <div className="flex items-center space-x-2">
@@ -239,7 +240,7 @@ export function RegistrationScreen({ userInfo, onProceedToPayment, initialData }
               </div>
             )}
 
-            {/* Botón de pago */}
+            {//* Botón de pago }
             <Button
               onClick={handleProceedToPayment}
               disabled={quantity <= 0}
@@ -253,6 +254,7 @@ export function RegistrationScreen({ userInfo, onProceedToPayment, initialData }
             </Button>
           </CardContent>
         </Card>
+        */}
       </div>
     </div>
   );

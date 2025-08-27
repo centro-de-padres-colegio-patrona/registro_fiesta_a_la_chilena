@@ -39,7 +39,7 @@ export function LoginScreen({ onGoogleLogin }: LoginScreenProps) {
               Colegio Patrona de Lourdes 2025
             </p>
             <p className="montserrat-light secondary-text text-gray-800 drop-shadow-sm">
-              Sistema de registro para el evento patrio
+              Sistema de registro para el evento
             </p>
           </div>
         </div>

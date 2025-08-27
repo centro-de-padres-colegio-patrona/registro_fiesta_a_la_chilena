@@ -76,9 +76,6 @@ export function EventSchedule({ selectedSchedule, onScheduleSelect }: EventSched
 
       {/* Horarios */}
       <div className="space-y-4">
-        <h3 className="montserrat-semibold text-gray-800 text-center mb-4">
-          Selecciona el Horario de tu Curso
-        </h3>
         <div className="grid gap-3">
           {scheduleItems.map((item, index) => {
             const scheduleId = `${item.time}-${item.grade}`;
