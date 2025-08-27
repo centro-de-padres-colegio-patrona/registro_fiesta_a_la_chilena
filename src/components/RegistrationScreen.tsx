@@ -9,8 +9,8 @@ import backgroundImage from 'figma:asset/2b69842406b081642813ed9577f3a813aa11c3f
 import centroPadresLogo from 'figma:asset/429226a720cfb4705d813cb886704ec2bdce1d00.png';
 
 interface UserInfo {
-  guardianName: string;
-  studentName: string;
+  curso: string;
+  seccion: string;
 }
 
 interface PurchaseData {
@@ -37,6 +37,14 @@ export function RegistrationScreen({ userInfo, onProceedToPayment, initialData }
   const pendingDebt = 5000;
   const subtotal = quantity * pricePerTicket;
   const total = hasPendingDebt ? subtotal + pendingDebt : subtotal;
+
+  const handleCursoChange = (e) => {
+    setUserInfo((prev) => ({ ...prev, curso: e.target.value }));
+  };
+
+  const handleSeccionChange = (e) => {
+    setUserInfo((prev) => ({ ...prev, seccion: e.target.value }));
+  };
 
   const handleQuantityChange = (change: number) => {
     const newQuantity = Math.max(0, quantity + change);
@@ -102,18 +110,41 @@ export function RegistrationScreen({ userInfo, onProceedToPayment, initialData }
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Curso */}
               <div className="flex items-center space-x-3 p-3 bg-gray-50/90 rounded-lg smooth-transition hover:bg-gray-100/90">
                 <User className="w-5 h-5 text-gray-600" />
                 <div>
-                  <p className="montserrat-light secondary-text">Curso</p>
-                  <p className="montserrat-semibold">{userInfo.guardianName}</p>
+                  <label htmlFor="curso" className="montserrat-light secondary-text block mb-1">Curso</label>
+                  <select
+                    id="curso"
+                    name="curso"
+                    className="montserrat-semibold bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={userInfo.curso}
+                    onChange={handleCursoChange}
+                  >
+                    <option value="">Selecciona un curso</option>
+                    <option value="PreKinder">PreKinder</option>
+                    <option value="Kinder">Kinder</option>
+                    <option value="1ro">1ro</option>
+                  </select>
                 </div>
               </div>
+              {/* Sección */}
               <div className="flex items-center space-x-3 p-3 bg-gray-50/90 rounded-lg smooth-transition hover:bg-gray-100/90">
                 <GraduationCap className="w-5 h-5 text-gray-600" />
                 <div>
-                  <p className="montserrat-light secondary-text">Seccion</p>
-                  <p className="montserrat-semibold">{userInfo.studentName}</p>
+                  <label htmlFor="seccion" className="montserrat-light secondary-text block mb-1">Sección</label>
+                  <select
+                    id="seccion"
+                    name="seccion"
+                    className="montserrat-semibold bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={userInfo.seccion}
+                    onChange={handleSeccionChange}
+                  >
+                    <option value="">Selecciona una sección</option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                  </select>
                 </div>
               </div>
             </div>
