@@ -47,6 +47,8 @@ export function RegistrationScreen({ userInfo, setUserInfo, onProceedToPayment, 
     setUserInfo((prev) => ({ ...prev, seccion: e.target.value }));
   };
 
+  const isOptionSelectEnabled = userInfo.curso !== "" && userInfo.seccion !== "";
+
   const handleQuantityChange = (change: number) => {
     const newQuantity = Math.max(0, quantity + change);
     setQuantity(newQuantity);
@@ -159,6 +161,7 @@ export function RegistrationScreen({ userInfo, setUserInfo, onProceedToPayment, 
                   </select>
                 </div>
               </div>
+              {/* */}
             </div>
           </CardContent>
         </Card>
