@@ -86,9 +86,29 @@ export function RegistrationScreen({ userInfo, setUserInfo, onProceedToPayment, 
       if (userInfo.curso && userInfo.seccion) {
         setLoadingAlumnos(true);
         try {
-          const res = await fetch(`/api/alumnos?curso=${userInfo.curso}&seccion=${userInfo.seccion}`);
+            const curso_map = {
+              "PreKinder": "Prekínder",
+              "Kinder": "Kínder",
+              "1ro": "1° Básico",
+              "2do": "2° Básico",
+              "3ro": "3° Básico",
+              "4to": "4° Básico",
+              "5to": "5° Básico",
+              "6to": "6° Básico",
+              "7mo": "7° Básico",
+              "8vo": "8° Básico",
+              "1roM": "I° Medio",
+              "2doM": "II° Medio",
+              "3roM": "III° Medio",
+              "4toM": "IV° Medio"
+            }
+
+          const url_api = `https://registro-patrona.onrender.com/api/alumnos?curso=${curso_map[userInfo.curso]}&seccion=${userInfo.seccion}`
+          console.log('url_api: ', url_api);
+          const res = await fetch(url_api);
           const data = await res.json();
-          setAlumnos(data.alumnos || []);
+          console.log(data);
+          setAlumnos(data || []);
         } catch (error) {
           console.error("Error al cargar alumnos:", error);
           setAlumnos([]);
