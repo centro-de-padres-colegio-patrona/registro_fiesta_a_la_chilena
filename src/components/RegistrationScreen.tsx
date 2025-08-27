@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Separator } from './ui/separator';
@@ -39,6 +39,9 @@ export function RegistrationScreen({ userInfo, setUserInfo, onProceedToPayment, 
   const subtotal = quantity * pricePerTicket;
   const total = hasPendingDebt ? subtotal + pendingDebt : subtotal;
 
+  const [alumnos, setAlumnos] = useState<string[]>([]);
+  const [loadingAlumnos, setLoadingAlumnos] = useState(false);
+
   const handleCursoChange = (e) => {
     setUserInfo((prev) => ({ ...prev, curso: e.target.value }));
   };
@@ -77,6 +80,36 @@ export function RegistrationScreen({ userInfo, setUserInfo, onProceedToPayment, 
       minimumFractionDigits: 0
     }).format(amount);
   };
+
+  useEffect(() => {
+    const fetchAlumnos = async () => {
+      if (userInfo.curso && userInfo.seccion) {
+        setLoadingAlumnos(true);
+        try {
+          const res = await fetch(`/api/alumnos?curso=${userInfo.curso}&seccion=${userInfo.seccion}`);
+          const data = await res.json();
+          setAlumnos(data.alumnos || []);
+        } catch (error) {
+          console.error("Error al cargar alumnos:", error);
+          setAlumnos([]);
+        } finally {
+          setLoadingAlumnos(false);
+        }
+      } else {
+        setAlumnos([]);
+      }
+    };
+
+    fetchAlumnos();
+  }, [userInfo.curso, userInfo.seccion]);
+
+  const handleAlumnoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setUserInfo((prev) => ({
+      ...prev,
+      alumno: e.target.value,
+    }));
+  };
+
 
   return (
     <div 
@@ -159,6 +192,33 @@ export function RegistrationScreen({ userInfo, setUserInfo, onProceedToPayment, 
                     <option value="A">A</option>
                     <option value="B">B</option>
                   </select>
+                </div>
+              </div>
+              {/* */}
+              <div className="flex items-center space-x-3 p-3 bg-gray-50/90 rounded-lg smooth-transition hover:bg-gray-100/90">
+                <User className="w-5 h-5 text-gray-600" />
+                <div>
+                  <label htmlFor="alumno" className="montserrat-light secondary-text block mb-1">Alumno</label>
+                  <select
+                    id="alumno"
+                    name="alumno"
+                    className={`montserrat-semibold bg-white border rounded px-2 py-1 focus:outline-none ${
+                      !userInfo.curso || !userInfo.seccion || loadingAlumnos
+                        ? "opacity-50 cursor-not-allowed"
+                        : "border-gray-300 focus:ring-2 focus:ring-blue-500"
+                    }`}
+                    value={userInfo.alumno}
+                    onChange={handleAlumnoChange}
+                    disabled={!userInfo.curso || !userInfo.seccion || loadingAlumnos}
+                  >
+                    <option value="">Selecciona un alumno</option>
+                    {alumnos.map((nombre, idx) => (
+                      <option key={idx} value={nombre}>{nombre}</option>
+                    ))}
+                  </select>
+                  {loadingAlumnos && (
+                    <p className="text-sm text-gray-500 mt-1">Cargando alumnos...</p>
+                  )}
                 </div>
               </div>
               {/* */}
