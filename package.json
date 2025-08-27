@@ -55,7 +55,9 @@
       },
       "scripts": {
             "dev": "vite",
-            "build": "vite build"
+            "build": "vite build",
+            "predeploy": "npm run build",
+            "deploy": "gh-pages -d dist"
       },
       "homepage": "https://lherreramena.github.io/registro_fiesta_a_la_chilena"
 }
