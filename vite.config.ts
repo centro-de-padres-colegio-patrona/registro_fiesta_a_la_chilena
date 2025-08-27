@@ -60,4 +60,5 @@
       open: true,
       allowedHosts: ['registro-fiesta-a-la-chilena.onrender.com'],
     },
+    base: 'registro_fiesta_a_la_chilena',
   });
