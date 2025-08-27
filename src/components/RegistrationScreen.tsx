@@ -1,75 +1,62 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Separator } from './ui/separator';
 import { Badge } from './ui/badge';
-import { Minus, Plus, User, GraduationCap, ChevronDown, ChevronUp } from 'lucide-react';
+import { Minus, Plus, User, GraduationCap, ChevronDown, ChevronUp, LogOut, Clock } from 'lucide-react';
 import { EventSchedule } from './EventSchedule';
 import backgroundImage from 'figma:asset/2b69842406b081642813ed9577f3a813aa11c3f8.png';
 import centroPadresLogo from 'figma:asset/429226a720cfb4705d813cb886704ec2bdce1d00.png';
 
+interface Student {
+  name: string;
+  grade: string;
+  rut: string;
+  schedule?: string;
+}
+
 interface UserInfo {
-  curso: string;
-  seccion: string;
+  guardianName: string;
+  students: Student[];
 }
 
 interface PurchaseData {
   quantity: number;
-  pricePerTicket: number;
+  total: number;
   hasPendingDebt: boolean;
   pendingDebt: number;
-  selectedSchedule?: string;
 }
 
 interface RegistrationScreenProps {
   userInfo: UserInfo;
-  setUserInfo: React.Dispatch<React.SetStateAction<UserInfo>>;
   onProceedToPayment: (data: PurchaseData) => void;
-  initialData: PurchaseData;
+  onSignOut: () => void;
 }
 
-export function RegistrationScreen({ userInfo, setUserInfo, onProceedToPayment, initialData }: RegistrationScreenProps) {
-  const [quantity, setQuantity] = useState(initialData.quantity);
-  const [hasPendingDebt, setHasPendingDebt] = useState(initialData.hasPendingDebt);
+export function RegistrationScreen({ userInfo, onProceedToPayment, onSignOut }: RegistrationScreenProps) {
+  const [quantity, setQuantity] = useState(1);
+  const [hasPendingDebt, setHasPendingDebt] = useState(false);
   const [showSchedule, setShowSchedule] = useState(false);
-  const [selectedSchedule, setSelectedSchedule] = useState<string | undefined>(initialData.selectedSchedule);
   
   const pricePerTicket = 15000;
   const pendingDebt = 5000;
   const subtotal = quantity * pricePerTicket;
   const total = hasPendingDebt ? subtotal + pendingDebt : subtotal;
 
-  const [alumnos, setAlumnos] = useState<string[]>([]);
-  const [loadingAlumnos, setLoadingAlumnos] = useState(false);
-
-  const handleCursoChange = (e) => {
-    setUserInfo((prev) => ({ ...prev, curso: e.target.value }));
-  };
-
-  const handleSeccionChange = (e) => {
-    setUserInfo((prev) => ({ ...prev, seccion: e.target.value }));
-  };
-
-  const isOptionSelectEnabled = userInfo.curso !== "" && userInfo.seccion !== "";
+  // Obtener horarios únicos de todos los estudiantes
+  const uniqueSchedules = [...new Set(userInfo.students.map(s => s.schedule).filter(Boolean))];
 
   const handleQuantityChange = (change: number) => {
-    const newQuantity = Math.max(0, quantity + change);
+    const newQuantity = Math.max(1, quantity + change);
     setQuantity(newQuantity);
   };
 
   const handleProceedToPayment = () => {
-    if (!selectedSchedule) {
-      alert('Por favor selecciona un horario antes de proceder al pago.');
-      setShowSchedule(true);
-      return;
-    }
-    
     onProceedToPayment({
       quantity,
-      pricePerTicket,
+      total,
       hasPendingDebt,
-      pendingDebt,
-      selectedSchedule
+      pendingDebt
     });
   };
 
@@ -80,56 +67,6 @@ export function RegistrationScreen({ userInfo, setUserInfo, onProceedToPayment, 
       minimumFractionDigits: 0
     }).format(amount);
   };
-
-  useEffect(() => {
-    const fetchAlumnos = async () => {
-      if (userInfo.curso && userInfo.seccion) {
-        setLoadingAlumnos(true);
-        try {
-            const curso_map = {
-              "PreKinder": "Prekínder",
-              "Kinder": "Kínder",
-              "1ro": "1° Básico",
-              "2do": "2° Básico",
-              "3ro": "3° Básico",
-              "4to": "4° Básico",
-              "5to": "5° Básico",
-              "6to": "6° Básico",
-              "7mo": "7° Básico",
-              "8vo": "8° Básico",
-              "1roM": "I° Medio",
-              "2doM": "II° Medio",
-              "3roM": "III° Medio",
-              "4toM": "IV° Medio"
-            }
-
-          const url_api = `https://registro-patrona.onrender.com/api/alumnos?curso=${curso_map[userInfo.curso]}&seccion=${userInfo.seccion}`
-          console.log('url_api: ', url_api);
-          const res = await fetch(url_api);
-          const data = await res.json();
-          console.log(data);
-          setAlumnos(data || []);
-        } catch (error) {
-          console.error("Error al cargar alumnos:", error);
-          setAlumnos([]);
-        } finally {
-          setLoadingAlumnos(false);
-        }
-      } else {
-        setAlumnos([]);
-      }
-    };
-
-    fetchAlumnos();
-  }, [userInfo.curso, userInfo.seccion]);
-
-  const handleAlumnoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setUserInfo((prev) => ({
-      ...prev,
-      alumno: e.target.value,
-    }));
-  };
-
 
   return (
     <div 
@@ -149,11 +86,22 @@ export function RegistrationScreen({ userInfo, setUserInfo, onProceedToPayment, 
         <Card className="shadow-2xl border-0 bg-white/90 backdrop-blur-md smooth-transition hover:shadow-3xl">
           <CardHeader className="pb-4">
             <div className="flex flex-col items-center space-y-4">
-              <img 
-                src={centroPadresLogo} 
-                alt="Centro de Padres Colegio Patrona de Lourdes" 
-                className="w-16 h-16 md:w-20 md:h-20 drop-shadow-lg smooth-transition hover:scale-105"
-              />
+              <div className="flex items-center justify-between w-full">
+                <img 
+                  src={centroPadresLogo} 
+                  alt="Centro de Padres Colegio Patrona de Lourdes" 
+                  className="w-16 h-16 md:w-20 md:h-20 drop-shadow-lg smooth-transition hover:scale-105"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onSignOut}
+                  className="border-gray-300 text-gray-600 hover:bg-gray-50 smooth-transition montserrat-regular"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Salir
+                </Button>
+              </div>
               <div className="text-center">
                 <CardTitle className="text-red-600 montserrat-black drop-shadow-lg">
                   Fiesta a la Chilena
@@ -165,83 +113,40 @@ export function RegistrationScreen({ userInfo, setUserInfo, onProceedToPayment, 
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Curso */}
+            <div className="space-y-4">
+              {/* Información del apoderado */}
               <div className="flex items-center space-x-3 p-3 bg-gray-50/90 rounded-lg smooth-transition hover:bg-gray-100/90">
                 <User className="w-5 h-5 text-gray-600" />
-                <div>
-                  <label htmlFor="curso" className="montserrat-light secondary-text block mb-1">Curso</label>
-                  <select
-                    id="curso"
-                    name="curso"
-                    className="montserrat-semibold bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    value={userInfo.curso}
-                    onChange={handleCursoChange}
-                  >
-                    <option value="">Selecciona un curso</option>
-                    <option value="PreKinder">PreKinder</option>
-                    <option value="Kinder">Kinder</option>
-                    <option value="1ro">1ro</option>
-                    <option value="2do">2do</option>
-                    <option value="3ro">3ro</option>
-                    <option value="4to">4to</option>
-                    <option value="5to">5to</option>
-                    <option value="6to">6to</option>
-                    <option value="7mo">7mo</option>
-                    <option value="8vo">8vo</option>
-                    <option value="1roM">1roM</option>
-                    <option value="2doM">2doM</option>
-                    <option value="3roM">3roM</option>
-                    <option value="4toM">4toM</option>
-                  </select>
+                <div className="flex-1">
+                  <p className="montserrat-light secondary-text">Apoderado</p>
+                  <p className="montserrat-semibold">{userInfo.guardianName}</p>
                 </div>
               </div>
-              {/* Sección */}
-              <div className="flex items-center space-x-3 p-3 bg-gray-50/90 rounded-lg smooth-transition hover:bg-gray-100/90">
-                <GraduationCap className="w-5 h-5 text-gray-600" />
-                <div>
-                  <label htmlFor="seccion" className="montserrat-light secondary-text block mb-1">Sección</label>
-                  <select
-                    id="seccion"
-                    name="seccion"
-                    className="montserrat-semibold bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    value={userInfo.seccion}
-                    onChange={handleSeccionChange}
-                  >
-                    <option value="">Selecciona una sección</option>
-                    <option value="A">A</option>
-                    <option value="B">B</option>
-                  </select>
-                </div>
+              
+              {/* Lista de estudiantes */}
+              <div className="space-y-2">
+                <p className="montserrat-medium text-gray-700">Estudiantes:</p>
+                {userInfo.students.map((student, index) => (
+                  <div key={index} className="flex items-center space-x-3 p-3 bg-blue-50/90 rounded-lg border border-blue-200 smooth-transition hover:bg-blue-100/90">
+                    <GraduationCap className="w-5 h-5 text-blue-600" />
+                    <div className="flex-1">
+                      <p className="montserrat-semibold text-blue-800">{student.name}</p>
+                      <p className="montserrat-regular text-blue-600">{student.grade}</p>
+                      {student.schedule && (
+                        <div className="flex items-center space-x-1 mt-1">
+                          <Clock className="w-3 h-3 text-blue-500" />
+                          <p className="montserrat-light text-blue-500 text-sm">
+                            {student.schedule.replace('-', ' - ')}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                    <Badge variant="secondary" className="montserrat-light">
+                      {student.rut}
+                    </Badge>
+                  </div>
+                ))}
               </div>
-              {/* */}
-              <div className="flex items-center space-x-3 p-3 bg-gray-50/90 rounded-lg smooth-transition hover:bg-gray-100/90">
-                <User className="w-5 h-5 text-gray-600" />
-                <div>
-                  <label htmlFor="alumno" className="montserrat-light secondary-text block mb-1">Alumno</label>
-                  <select
-                    id="alumno"
-                    name="alumno"
-                    className={`montserrat-semibold bg-white border rounded px-2 py-1 focus:outline-none ${
-                      !userInfo.curso || !userInfo.seccion || loadingAlumnos
-                        ? "opacity-50 cursor-not-allowed"
-                        : "border-gray-300 focus:ring-2 focus:ring-blue-500"
-                    }`}
-                    value={userInfo.alumno}
-                    onChange={handleAlumnoChange}
-                    disabled={!userInfo.curso || !userInfo.seccion || loadingAlumnos}
-                  >
-                    <option value="">Selecciona un alumno</option>
-                    {alumnos.map((nombre, idx) => (
-                      <option key={idx} value={nombre}>{nombre}</option>
-                    ))}
-                  </select>
-                  {loadingAlumnos && (
-                    <p className="text-sm text-gray-500 mt-1">Cargando alumnos...</p>
-                  )}
-                </div>
-              </div>
-              {/* */}
             </div>
           </CardContent>
         </Card>
@@ -255,7 +160,7 @@ export function RegistrationScreen({ userInfo, setUserInfo, onProceedToPayment, 
               className="w-full justify-between p-0 h-auto text-left smooth-transition hover:bg-blue-50/80"
             >
               <CardTitle className="montserrat-semibold text-blue-600 drop-shadow-sm">
-                Ver Itinerario del Evento
+                Ver Itinerario Completo del Evento
               </CardTitle>
               {showSchedule ? (
                 <ChevronUp className="w-5 h-5 text-blue-600 smooth-transition" />
@@ -267,24 +172,50 @@ export function RegistrationScreen({ userInfo, setUserInfo, onProceedToPayment, 
           {showSchedule && (
             <CardContent className="pt-0 fade-in">
               <EventSchedule 
-                selectedSchedule={selectedSchedule}
-                onScheduleSelect={setSelectedSchedule}
+                selectedSchedules={uniqueSchedules}
+                readOnly={true}
               />
             </CardContent>
           )}
         </Card>
 
+        {/* Horarios asignados automáticamente */}
+        {uniqueSchedules.length > 0 && (
+          <Card className="shadow-2xl border-0 bg-green-50/90 backdrop-blur-md smooth-transition hover:shadow-3xl">
+            <CardHeader>
+              <CardTitle className="montserrat-semibold text-green-700">
+                Horarios Asignados Automáticamente
+              </CardTitle>
+              <p className="montserrat-light text-green-600">
+                Basado en los cursos de tus estudiantes
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {uniqueSchedules.map((schedule, index) => (
+                <div key={index} className="flex items-center space-x-2 p-3 bg-white/80 rounded-lg border border-green-200">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="montserrat-medium text-green-800">
+                    {schedule?.replace('-', ' - ')}
+                  </span>
+                </div>
+              ))}
+              <p className="montserrat-light text-green-600 text-sm">
+                ✓ No necesitas seleccionar horarios manualmente
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Selector de entradas */}
-        {/*
         <Card className="shadow-2xl border-0 bg-white/90 backdrop-blur-md smooth-transition hover:shadow-3xl">
           <CardHeader>
-            
+            <CardTitle className="montserrat-semibold">Seleccionar Entradas</CardTitle>
             <p className="montserrat-light secondary-text">
               Adquiere tus entradas para participar en la celebración patria
             </p>
           </CardHeader>
           <CardContent className="space-y-6">
-            {// Contador de entradas }
+            {/* Contador de entradas */}
             <div className="flex items-center justify-between p-4 bg-gray-50/90 rounded-lg smooth-transition hover:bg-gray-100/90">
               <div>
                 <h3 className="montserrat-semibold">Entrada General</h3>
@@ -296,7 +227,7 @@ export function RegistrationScreen({ userInfo, setUserInfo, onProceedToPayment, 
                   variant="outline"
                   size="sm"
                   onClick={() => handleQuantityChange(-1)}
-                  disabled={quantity <= 0}
+                  disabled={quantity <= 1}
                   className="w-8 h-8 p-0 border-blue-600 text-blue-600 hover:bg-blue-50/80 smooth-transition montserrat-semibold"
                 >
                   <Minus className="w-4 h-4" />
@@ -313,7 +244,7 @@ export function RegistrationScreen({ userInfo, setUserInfo, onProceedToPayment, 
               </div>
             </div>
 
-            {// Toggle para deuda pendiente //}
+            {/* Toggle para deuda pendiente */}
             <div className="flex items-center justify-between">
               <span className="montserrat-regular">¿Tienes deuda pendiente?</span>
               <Button
@@ -332,7 +263,7 @@ export function RegistrationScreen({ userInfo, setUserInfo, onProceedToPayment, 
 
             <Separator />
 
-            {// Desglose de costos }
+            {/* Desglose de costos */}
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <span className="montserrat-regular">Subtotal ({quantity} entrada{quantity !== 1 ? 's' : ''})</span>
@@ -354,33 +285,15 @@ export function RegistrationScreen({ userInfo, setUserInfo, onProceedToPayment, 
               </div>
             </div>
 
-            {// Estado del horario seleccionado }
-            {selectedSchedule && (
-              <div className="p-3 bg-green-50/90 border border-green-200 rounded-lg fade-in backdrop-blur-sm">
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="montserrat-medium text-green-700">
-                    Horario seleccionado: <span className="montserrat-semibold">{selectedSchedule.replace('-', ' - ')}</span>
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {//* Botón de pago }
+            {/* Botón de pago */}
             <Button
               onClick={handleProceedToPayment}
-              disabled={quantity <= 0}
-              className={`w-full py-3 text-lg shadow-xl hover:shadow-2xl smooth-transition montserrat-semibold ${
-                !selectedSchedule 
-                  ? 'bg-gray-400 hover:bg-gray-500 text-white cursor-not-allowed' 
-                  : 'bg-blue-600 hover:bg-blue-700 text-white'
-              }`}
+              className="w-full py-3 text-lg shadow-xl hover:shadow-2xl smooth-transition montserrat-semibold bg-blue-600 hover:bg-blue-700 text-white"
             >
-              {!selectedSchedule ? 'Selecciona un horario primero' : `Ir a Pagar ${formatCurrency(total)}`}
+              Proceder al Pago {formatCurrency(total)}
             </Button>
           </CardContent>
         </Card>
-        */}
       </div>
     </div>
   );

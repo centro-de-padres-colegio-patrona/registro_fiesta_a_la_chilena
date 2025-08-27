@@ -1,28 +1,34 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
-import { MapPin, Calendar } from 'lucide-react';
+import { MapPin, Calendar, Clock } from 'lucide-react';
 
 function ScheduleItem({ 
   time, 
   grade, 
   details, 
   isSelected, 
-  onClick 
+  onClick,
+  readOnly = false
 }: { 
   time: string; 
   grade: string; 
   details?: string;
   isSelected: boolean;
-  onClick: () => void;
+  onClick?: () => void;
+  readOnly?: boolean;
 }) {
+  const Component = readOnly ? 'div' : 'button';
+  
   return (
-    <button
-      onClick={onClick}
+    <Component
+      onClick={readOnly ? undefined : onClick}
       className={`flex flex-col gap-1 p-4 rounded-lg smooth-transition text-left w-full backdrop-blur-sm ${
         isSelected 
           ? 'bg-blue-600 text-white shadow-xl scale-105' 
-          : 'bg-white/85 border-2 border-blue-200 text-blue-600 hover:bg-blue-50/90 hover:border-blue-300'
+          : readOnly
+          ? 'bg-gray-50/85 border border-gray-200 text-gray-700'
+          : 'bg-white/85 border-2 border-blue-200 text-blue-600 hover:bg-blue-50/90 hover:border-blue-300 cursor-pointer'
       }`}
     >
       <div className="montserrat-semibold leading-tight">
@@ -33,16 +39,29 @@ function ScheduleItem({
           • {details}
         </div>
       )}
-    </button>
+      {isSelected && (
+        <div className="flex items-center space-x-1 mt-1">
+          <Clock className="w-3 h-3" />
+          <span className="montserrat-light text-xs">Horario asignado</span>
+        </div>
+      )}
+    </Component>
   );
 }
 
 interface EventScheduleProps {
   selectedSchedule?: string;
-  onScheduleSelect: (schedule: string) => void;
+  selectedSchedules?: string[];
+  onScheduleSelect?: (schedule: string) => void;
+  readOnly?: boolean;
 }
 
-export function EventSchedule({ selectedSchedule, onScheduleSelect }: EventScheduleProps) {
+export function EventSchedule({ 
+  selectedSchedule, 
+  selectedSchedules = [], 
+  onScheduleSelect, 
+  readOnly = false 
+}: EventScheduleProps) {
   const scheduleItems = [
     { time: "9:30", grade: "Pre-Kinder y Kinder", details: "Receso a las 10:00" },
     { time: "10:20", grade: "3° y 4° Básicos", details: "10:50 Receso" },
@@ -76,17 +95,23 @@ export function EventSchedule({ selectedSchedule, onScheduleSelect }: EventSched
 
       {/* Horarios */}
       <div className="space-y-4">
+        <h3 className="montserrat-semibold text-gray-800 text-center mb-4">
+          {readOnly ? 'Itinerario Completo del Evento' : 'Selecciona el Horario de tu Curso'}
+        </h3>
         <div className="grid gap-3">
           {scheduleItems.map((item, index) => {
             const scheduleId = `${item.time}-${item.grade}`;
+            const isSelected = selectedSchedule === scheduleId || selectedSchedules.includes(scheduleId);
+            
             return (
               <ScheduleItem
                 key={index}
                 time={item.time}
                 grade={item.grade}
                 details={item.details}
-                isSelected={selectedSchedule === scheduleId}
-                onClick={() => onScheduleSelect(scheduleId)}
+                isSelected={isSelected}
+                onClick={onScheduleSelect ? () => onScheduleSelect(scheduleId) : undefined}
+                readOnly={readOnly}
               />
             );
           })}
@@ -96,8 +121,11 @@ export function EventSchedule({ selectedSchedule, onScheduleSelect }: EventSched
       {/* Nota importante */}
       <div className="bg-blue-50/85 border-l-4 border-blue-400 p-4 rounded smooth-transition hover:bg-blue-100/90 backdrop-blur-sm">
         <p className="montserrat-regular text-blue-700">
-          <span className="montserrat-bold">Importante:</span> Por favor, llegue 15 minutos antes del horario asignado a su curso.
-          En caso de duda sobre el horario, consulte con la secretaría del colegio.
+          <span className="montserrat-bold">Importante:</span> {
+            readOnly 
+              ? 'Los horarios mostrados arriba son los asignados automáticamente según los cursos de tus estudiantes.'
+              : 'Por favor, llegue 15 minutos antes del horario asignado a su curso. En caso de duda sobre el horario, consulte con la secretaría del colegio.'
+          }
         </p>
       </div>
     </div>
