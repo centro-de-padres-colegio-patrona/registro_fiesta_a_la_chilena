@@ -57,7 +57,6 @@ export function LoginScreen({ onGoogleLogin, error, loading }: LoginScreenProps)
             <div className="space-y-1 montserrat-regular text-gray-600">
               <p>📅 <span className="montserrat-medium">Viernes 6 de Septiembre, 2025</span></p>
               <p>📍 <span className="montserrat-medium">Alicahue # 7370, La Florida</span></p>
-              <p>🎉 <span className="montserrat-medium">Celebración de Fiestas Patrias</span></p>
             </div>
           </div>
         </div>
@@ -106,7 +105,7 @@ export function LoginScreen({ onGoogleLogin, error, loading }: LoginScreenProps)
         {/* Información adicional */}
         <div className="text-center space-y-2">
           <p className="montserrat-light help-text text-gray-800">
-            ¿Necesitas ayuda? Contacta a la secretaría del colegio
+            ¿Necesitas ayuda? Ingresa tu consulta
           </p>
           <p className="montserrat-medium text-blue-600 drop-shadow-sm">
             📞 +56 2 1234 5678
